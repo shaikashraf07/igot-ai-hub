@@ -1,26 +1,99 @@
-# Blueprint Web Builder
+# iGOT AI Hub
 
-buils a web page according to attached pdf requirements
+> AI-powered competency-driven learning and personalized development platform for civil servants.
 
-This project was built with [Lovable](https://lovable.dev).
+## Overview
 
-**Live app**: https://story-boarder-web.lovable.app
+**iGOT AI Hub** is a competency-driven learning platform designed to help civil servants identify competency gaps, receive personalized learning recommendations, track learning progress, and measure competency improvement through assessment and reassessment.
 
-## Build with Lovable
+The platform follows a closed-loop learning approach:
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/db03592f-6a6f-4db3-9aeb-f404b0db67ca).
+**Assess → Analyze → Recommend → Learn → Reassess → Improve**
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+The current version is an **SIH prototype** that uses a Mock iGOT Adapter to simulate integration with the iGOT Karmayogi ecosystem.
 
-## Development
+---
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Key Features
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+### 🎯 Competency Assessment
+- Diagnostic competency assessment
+- Situational assessment questions
+- Automated scoring
+- Assessment result analysis
+- Strength and development-area identification
+
+### 📊 Competency & Skill Gap Analysis
+- Competency profile
+- Role-based competency benchmarks
+- Dynamic skill-gap identification
+- Gap severity and prioritization
+- Competency readiness analysis
+- Root-cause insights
+
+### 🤖 Intelligent Recommendations
+- Personalized course recommendations
+- Multi-factor course matching
+- Competency-gap-based prioritization
+- Cadre and role relevance
+- Recommendation match scores
+- Explainable recommendation reasoning
+
+### 📚 Personalized Learning Pathway
+- Sequenced learning recommendations
+- Priority-based development milestones
+- Course enrollment
+- Learning progress tracking
+- Course completion tracking
+
+### 🔄 Reassessment & Competency Improvement
+- Post-learning reassessment
+- Before/after competency comparison
+- Competency improvement tracking
+- Benchmark achievement detection
+
+### 📈 Progress & Analytics
+- Competency growth trends
+- Learning progress
+- Training hours
+- Competency deficit burndown
+- Readiness indicators
+- Learning pathway milestones
+
+### 🧠 AI-Assisted Insights
+- Personalized competency insights
+- Explainable skill-gap analysis
+- Assessment feedback
+- Personalized learning explanations
+- Recommendation rationale
+
+---
+
+## Application Flow
+
+```text
+                 Learner
+                    ↓
+             Diagnostic Assessment
+                    ↓
+            Competency Assessment
+                    ↓
+             Skill Gap Analysis
+                    ↓
+        Intelligent Recommendation
+                    ↓
+              iGOT Course
+                    ↓
+               Enrollment
+                    ↓
+             Learning Progress
+                    ↓
+              Course Completion
+                    ↓
+          Competency Improvement
+                    ↓
+              Reassessment
+                    ↓
+          Updated Competency Profile
+                    ↓
+          Progress & Analytics
