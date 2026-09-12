@@ -1,0 +1,127 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * iGOT AI Hub design system.
+ * Institutional government palette: navy dominant, blue secondary,
+ * saffron used sparingly as an identity accent.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 3px);
+  --radius-md: calc(var(--radius) - 1px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --font-sans: "Inter", "Noto Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface-muted: var(--surface-muted);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --shadow-card: 0 1px 2px oklch(0.2 0.05 255 / 0.06), 0 1px 3px oklch(0.2 0.05 255 / 0.05);
+}
+
+:root {
+  --radius: 0.5rem;
+
+  /* #F7F9FC */
+  --background: oklch(0.976 0.005 254);
+  /* #17202A */
+  --foreground: oklch(0.234 0.017 258);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
+  /* #123B66 */
+  --primary: oklch(0.351 0.079 250);
+  --primary-foreground: oklch(0.99 0 0);
+  /* #1F5A91 */
+  --secondary: oklch(0.462 0.093 249);
+  --secondary-foreground: oklch(0.99 0 0);
+  --muted: oklch(0.956 0.006 254);
+  /* #5B6573 */
+  --muted-foreground: oklch(0.505 0.017 257);
+  /* #E87524 */
+  --accent: oklch(0.685 0.169 48);
+  --accent-foreground: oklch(0.99 0 0);
+  /* #B42318 */
+  --destructive: oklch(0.499 0.187 28);
+  --destructive-foreground: oklch(0.99 0 0);
+  /* #237A57 */
+  --success: oklch(0.503 0.093 161);
+  --success-foreground: oklch(0.99 0 0);
+  /* #B7791F */
+  --warning: oklch(0.596 0.117 76);
+  --warning-foreground: oklch(0.99 0 0);
+  --border: oklch(0.912 0.008 254);
+  --input: oklch(0.9 0.01 254);
+  --ring: var(--secondary);
+  --surface-muted: oklch(0.966 0.008 254);
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-accent: oklch(0.946 0.019 250);
+  --sidebar-accent-foreground: var(--primary);
+  --sidebar-border: var(--border);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: var(--primary);
+    letter-spacing: -0.01em;
+  }
+}
+
+@utility gov-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
