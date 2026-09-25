@@ -243,7 +243,8 @@ export const assessmentQuestions = [
   {
     id: "q2",
     competency: "Leadership",
-    question: "Your team repeatedly misses file movement timelines. The most effective response is to:",
+    question:
+      "Your team repeatedly misses file movement timelines. The most effective response is to:",
     options: [
       "Issue a written warning to all staff",
       "Take over the pending files yourself",
@@ -308,9 +309,24 @@ export const progressTrend = [
 ];
 
 export const tasks = [
-  { id: "t1", title: "Complete Module 3 — Decision frameworks", due: "Due today", status: "urgent" },
-  { id: "t2", title: "Leadership competency reassessment", due: "Due in 3 days", status: "upcoming" },
-  { id: "t3", title: "Submit reflection note — Root Cause Analysis", due: "Due in 6 days", status: "upcoming" },
+  {
+    id: "t1",
+    title: "Complete Module 3 — Decision frameworks",
+    due: "Due today",
+    status: "urgent",
+  },
+  {
+    id: "t2",
+    title: "Leadership competency reassessment",
+    due: "Due in 3 days",
+    status: "upcoming",
+  },
+  {
+    id: "t3",
+    title: "Submit reflection note — Root Cause Analysis",
+    due: "Due in 6 days",
+    status: "upcoming",
+  },
 ];
 
 /* Service layer — swap these implementations for real iGOT API calls. */

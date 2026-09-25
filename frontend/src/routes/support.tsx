@@ -8,9 +8,11 @@ import {
   Phone,
   FileQuestion,
   ExternalLink,
+  ShieldCheck,
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, PageHeader } from "@/components/ui/primitives";
+import { governmentDatasetService } from "@/services";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/support")({
@@ -66,13 +68,20 @@ function SupportPage() {
     setTimeout(() => {
       setIsSubmitting(false);
       setTicketDetails("");
-      toast.success("Support ticket logged successfully! Ticket ID: #KMY-" + Math.floor(100000 + Math.random() * 900000));
+      toast.success(
+        "Support ticket logged successfully! Ticket ID: #KMY-" +
+          Math.floor(100000 + Math.random() * 900000),
+      );
     }, 600);
   };
 
   return (
     <AppLayout>
       <PageHeader
+        breadcrumbs={[
+          { label: "Dashboard", to: "/" },
+          { label: "Help & Support" },
+        ]}
         title="Help & Support Desk"
         subtitle="National Programme for Civil Services Capacity Building (NPCSCB) · Technical & Learner Assistance"
       />
@@ -134,15 +143,18 @@ function SupportPage() {
             title="Frequently Asked Questions"
             subtitle="Common questions regarding assessments, scores, and course completion"
           >
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border" role="region" aria-label="Frequently Asked Questions list">
               {faqs.map((faq, index) => {
                 const isOpen = openFaq === index;
+                const faqId = `faq-answer-${index}`;
                 return (
                   <div key={index} className="py-3.5 first:pt-0 last:pb-0">
                     <button
                       type="button"
+                      aria-expanded={isOpen}
+                      aria-controls={faqId}
                       onClick={() => setOpenFaq(isOpen ? null : index)}
-                      className="flex w-full items-start justify-between gap-3 text-left font-medium text-foreground hover:text-primary"
+                      className="flex w-full items-start justify-between gap-3 text-left font-medium text-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
                     >
                       <span className="flex items-start gap-2.5 text-sm">
                         <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
@@ -155,7 +167,7 @@ function SupportPage() {
                       />
                     </button>
                     {isOpen ? (
-                      <p className="mt-2.5 pl-6.5 text-sm leading-relaxed text-muted-foreground">
+                      <p id={faqId} className="mt-2.5 pl-6.5 text-sm leading-relaxed text-muted-foreground">
                         {faq.a}
                       </p>
                     ) : null}
@@ -174,10 +186,11 @@ function SupportPage() {
           >
             <form onSubmit={handleTicketSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <label htmlFor="ticket-category" className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Issue Category
                 </label>
                 <select
+                  id="ticket-category"
                   value={ticketCategory}
                   onChange={(e) => setTicketCategory(e.target.value)}
                   className="focus-ring mt-1 w-full rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground"
@@ -191,10 +204,11 @@ function SupportPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <label htmlFor="ticket-details" className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Description
                 </label>
                 <textarea
+                  id="ticket-details"
                   rows={4}
                   value={ticketDetails}
                   onChange={(e) => setTicketDetails(e.target.value)}
@@ -211,6 +225,96 @@ function SupportPage() {
           </Card>
         </div>
       </div>
+
+      {/* Phase 10: Official Source & Provenance Registry */}
+      {(() => {
+        const sources = [
+          {
+            area: "Problem Statement",
+            resource: "SIH26101",
+            purpose: "MoSPI Problem Statement & Competency Mandate",
+            authority: "Official PS",
+            url: "https://www.mospi.gov.in/",
+          },
+          {
+            area: "NSSTA",
+            resource: "NSSTA Offerings & Curriculum",
+            purpose: "Official Training Offerings and Public Course Catalogue",
+            authority: "Official NSSTA",
+            url: "https://nssta.gov.in/offerings",
+          },
+          {
+            area: "NSSTA",
+            resource: "Advance Training Calendar FY2025-26",
+            purpose: "Advance training schedule & batch parameters",
+            authority: "Official Circular",
+            url: "https://www.mospi.gov.in/sites/default/files/announcements/Circular_NSSTA_Advance_Training_Calander_FY(25-26).pdf",
+          },
+          {
+            area: "MoSPI",
+            resource: "eSankhyiki National Data Portal",
+            purpose: "Official public statistical dataset catalogue & microdata",
+            authority: "Official MoSPI",
+            url: "https://esankhyiki.mospi.gov.in/catalogue-main",
+          },
+          {
+            area: "iGOT Karmayogi",
+            resource: "CBP Architecture Benchmark",
+            purpose: "AI-driven role/competency mapping reference standard",
+            authority: "DoPT / CBC",
+            url: "https://portal.igotkarmayogi.gov.in/training-pla-ai/",
+          },
+        ];
+
+        return (
+          <Card
+            className="mt-6"
+            title="Official Source & Provenance Registry"
+            subtitle="Verified government authorities, ministerial portals, and dataset documentation backing the platform's reference intelligence."
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs" role="table">
+                <thead className="border-b border-border bg-surface-muted/60 text-muted-foreground uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th scope="col" className="p-3 font-semibold">Area</th>
+                    <th scope="col" className="p-3 font-semibold">Resource</th>
+                    <th scope="col" className="p-3 font-semibold">Purpose</th>
+                    <th scope="col" className="p-3 font-semibold">Authority</th>
+                    <th scope="col" className="p-3 font-semibold">Verified Source Link</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border text-foreground">
+                  {sources.map((s, idx) => (
+                    <tr key={idx} className="hover:bg-muted/30 transition-colors">
+                      <td className="p-3 font-semibold text-secondary">{s.area}</td>
+                      <td className="p-3 font-medium">{s.resource}</td>
+                      <td className="p-3 text-muted-foreground">{s.purpose}</td>
+                      <td className="p-3">
+                        <Badge tone="neutral">{s.authority}</Badge>
+                      </td>
+                      <td className="p-3">
+                        <a
+                          href={s.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-primary hover:underline font-mono text-[11px]"
+                        >
+                          Visit Portal <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <p className="mt-3 text-[11px] text-muted-foreground">
+              <ShieldCheck className="inline-block mr-1 h-3.5 w-3.5 text-success" />
+              <strong>Audit Notice:</strong> All institutional links are verified against the official MoSPI/NSSTA source registry provided in STATsense data collection pack. Raw microdata and live authenticated access adhere to GSDD 2026 data governance protocols.
+            </p>
+          </Card>
+        );
+      })()}
     </AppLayout>
   );
 }

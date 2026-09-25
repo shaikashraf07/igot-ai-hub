@@ -12,33 +12,38 @@ import { generateDiagnosticInsights } from "./intelligence-engine";
 /**
  * Competency action & evidence metadata for dynamic gap derivations.
  */
-const COMPETENCY_METADATA: Record<string, { evidence: string; action: string; courseId: string }> = {
-  "Decision Making": {
-    evidence: "Assessment score indicates structured decision frameworks and data reconciliation need development",
-    action: "Complete Evidence-Based Decision Making for Administrators",
-    courseId: "c1",
-  },
-  Leadership: {
-    evidence: "Supervisor review flagged team delegation and hierarchy management as areas to develop",
-    action: "Enrol in Leading Teams in Public Administration",
-    courseId: "c2",
-  },
-  "Problem Solving": {
-    evidence: "Case-study assessment below role benchmark; recurring grievance handling needs structured RCA",
-    action: "Practice module: Root Cause Analysis in Governance",
-    courseId: "c3",
-  },
-  Communication: {
-    evidence: "Official note drafting and correspondence sample slightly below target band",
-    action: "Short course: Official Drafting and Noting",
-    courseId: "c4",
-  },
-  "Digital Skills": {
-    evidence: "DPI and data protection compliance needs refresher for departmental service design",
-    action: "Study module: Digital Public Infrastructure Essentials",
-    courseId: "c5",
-  },
-};
+const COMPETENCY_METADATA: Record<string, { evidence: string; action: string; courseId: string }> =
+  {
+    "Decision Making": {
+      evidence:
+        "Assessment score indicates structured decision frameworks and data reconciliation need development",
+      action: "Complete Evidence-Based Decision Making for Administrators",
+      courseId: "c1",
+    },
+    Leadership: {
+      evidence:
+        "Supervisor review flagged team delegation and hierarchy management as areas to develop",
+      action: "Enrol in Leading Teams in Public Administration",
+      courseId: "c2",
+    },
+    "Problem Solving": {
+      evidence:
+        "Case-study assessment below role benchmark; recurring grievance handling needs structured RCA",
+      action: "Practice module: Root Cause Analysis in Governance",
+      courseId: "c3",
+    },
+    Communication: {
+      evidence: "Official note drafting and correspondence sample slightly below target band",
+      action: "Short course: Official Drafting and Noting",
+      courseId: "c4",
+    },
+    "Digital Skills": {
+      evidence:
+        "DPI and data protection compliance needs refresher for departmental service design",
+      action: "Study module: Digital Public Infrastructure Essentials",
+      courseId: "c5",
+    },
+  };
 
 /**
  * Safely find the competency with the highest priority deficit below benchmark target.
@@ -48,7 +53,7 @@ export function getPriorityCompetency(competencies: Competency[]): Competency | 
   if (!competencies || competencies.length === 0) return null;
   const gaps = competencies.filter((c) => c.score < c.target);
   if (gaps.length === 0) return null;
-  return [...gaps].sort((a, b) => (b.target - b.score) - (a.target - a.score))[0] ?? null;
+  return [...gaps].sort((a, b) => b.target - b.score - (a.target - a.score))[0] ?? null;
 }
 
 /**
@@ -107,7 +112,7 @@ export function deriveSkillGaps(competencies: Competency[]): SkillGap[] {
     .sort((a, b) => {
       const pOrder: Record<PriorityLevel, number> = { High: 0, Medium: 1, Low: 2 };
       const diff = pOrder[a.priority] - pOrder[b.priority];
-      return diff !== 0 ? diff : (b.target - b.current) - (a.target - a.current);
+      return diff !== 0 ? diff : b.target - b.current - (a.target - a.current);
     });
 }
 
@@ -138,7 +143,11 @@ export function deriveRecommendations(courses: Course[], competencies: Competenc
 
   // Include courses that already had a preset reason if not completed
   for (const course of courses) {
-    if (course.reason && (course.progress ?? 0) < 100 && !recommended.some((r) => r.id === course.id)) {
+    if (
+      course.reason &&
+      (course.progress ?? 0) < 100 &&
+      !recommended.some((r) => r.id === course.id)
+    ) {
       recommended.push(course);
     }
   }
@@ -178,7 +187,7 @@ export function computeLearningSummary(
     completedCourses: completed.length,
     inProgressCourses: inProgress.length,
     notStartedCourses: notStarted.length,
-    learningHoursLogged: 18 + completed.length * 6 + inProgress.length * 2,
+    learningHoursLogged: completed.length * 6 + inProgress.length * 2,
   };
 }
 
@@ -206,7 +215,8 @@ export function evaluateAssessment(
         id: q.id,
         question: q.question,
         competency: q.competency,
-        selectedAnswer: selected !== undefined ? (q.options[selected] ?? "Not answered") : "Not answered",
+        selectedAnswer:
+          selected !== undefined ? (q.options[selected] ?? "Not answered") : "Not answered",
         correctAnswer: q.options[q.answer] ?? "Standard policy answer",
       });
     }

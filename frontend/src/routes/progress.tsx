@@ -16,7 +16,13 @@ import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, PageHeader } from "@/components/ui/primitives";
 import { ErrorState, LoadingState } from "@/components/FeedbackStates";
 import { aiInsightService, progressService, competencyService } from "@/services";
-import type { Competency, CompetencyAnalysisReport, LearningSummary, PathwayAIExplanation, ProgressTrendPoint } from "@/types/igot";
+import type {
+  Competency,
+  CompetencyAnalysisReport,
+  LearningSummary,
+  PathwayAIExplanation,
+  ProgressTrendPoint,
+} from "@/types/igot";
 
 export const Route = createFileRoute("/progress")({
   head: () => ({
@@ -79,7 +85,10 @@ function ProgressPage() {
           title="Progress & Analytics"
           subtitle="Tracking long-term competency improvement, course completions, and official learning activity."
         />
-        <LoadingState message="Generating capability analytics and learning progress charts..." count={4} />
+        <LoadingState
+          message="Generating capability analytics and learning progress charts..."
+          count={4}
+        />
       </AppLayout>
     );
   }
@@ -98,18 +107,26 @@ function ProgressPage() {
 
   const totalHistoricalHours = trends.reduce((acc, t) => acc + t.hoursSpent, 0);
   const totalHours = totalHistoricalHours + (summary?.learningHoursLogged ?? 0);
-  const currentCompetencyScore = analysis?.overallHealthIndex ?? summary?.overallCompetency ?? 74;
-  const completedCourses = summary?.completedCourses ?? 3;
-  const inProgressCourses = summary?.inProgressCourses ?? 2;
-  const enrolledTotal = summary?.enrolledCourses ?? 5;
+  const currentCompetencyScore = competencies.length > 0
+    ? (analysis?.overallHealthIndex ?? summary?.overallCompetency ?? 0)
+    : null; // null = not yet assessed
+  const completedCourses = summary?.completedCourses ?? 0;
+  const inProgressCourses = summary?.inProgressCourses ?? 0;
+  const enrolledTotal = summary?.enrolledCourses ?? 0;
 
   return (
     <AppLayout>
       <PageHeader
         title="Progress & Analytics"
         subtitle="Tracking long-term competency improvement, course completions, and official learning activity."
+        breadcrumbs={[{ label: "Progress & Analytics" }]}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link to="/assessments/reassessment">
+              <Button variant="outline" size="sm">
+                Reassessment Impact →
+              </Button>
+            </Link>
             <Link to="/skill-gaps">
               <Button variant="outline" size="sm">
                 View Skill Gaps
@@ -129,9 +146,17 @@ function ProgressPage() {
             <p className="text-sm text-muted-foreground">Overall Competency Score</p>
             <TrendingUp className="h-4 w-4 text-secondary" />
           </div>
-          <p className="mt-2 text-3xl font-semibold text-primary">{currentCompetencyScore}%</p>
+          <p className="mt-2 text-3xl font-semibold text-primary">
+            {currentCompetencyScore !== null ? `${currentCompetencyScore}%` : "–"}
+          </p>
           <p className="mt-1 text-xs text-success">
-            {analysis ? analysis.readinessBand : currentCompetencyScore >= 75 ? "Benchmark achieved" : "Active capability buildup"}
+            {currentCompetencyScore === null
+              ? "Complete an assessment to see your score"
+              : analysis
+                ? analysis.readinessBand
+                : currentCompetencyScore >= 75
+                ? "Benchmark achieved"
+                : "Active capability buildup"}
           </p>
         </div>
 
@@ -153,7 +178,9 @@ function ProgressPage() {
           </div>
           <p className="mt-2 text-3xl font-semibold text-primary">{totalHours} Hours</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            {totalHours >= 50 ? "50-hour civil service mandate met!" : `${Math.max(0, 50 - totalHours)} hrs to annual mandate`}
+            {totalHours >= 50
+              ? "50-hour civil service mandate met!"
+              : `${Math.max(0, 50 - totalHours)} hrs to annual mandate`}
           </p>
         </div>
 
@@ -172,7 +199,10 @@ function ProgressPage() {
         <div className="mt-6">
           <Card
             title="Competency Deficit Burndown & Target Projection"
-            subtitle={pathwayAI?.overallStrategy ?? "Trajectory to reach 100% compliance with designated cadre benchmarks"}
+            subtitle={
+              pathwayAI?.overallStrategy ??
+              "Trajectory to reach 100% compliance with designated cadre benchmarks"
+            }
           >
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
               <div>
@@ -183,20 +213,23 @@ function ProgressPage() {
                       analysis.readinessBand === "Role Ready"
                         ? "success"
                         : analysis.readinessBand === "Moderate Progression Required"
-                        ? "warning"
-                        : "danger"
+                          ? "warning"
+                          : "danger"
                     }
                   >
                     {analysis.readinessBand}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
-                    Total Deficit: <strong>{analysis.totalDeficitPoints} points</strong> across all competencies
+                    Total Deficit: <strong>{analysis.totalDeficitPoints} points</strong> across all
+                    competencies
                   </span>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-xs text-muted-foreground">Est. Investment to Complete</p>
-                <p className="text-lg font-bold text-primary">{analysis.estimatedHoursToBenchmark} hours</p>
+                <p className="text-lg font-bold text-primary">
+                  {analysis.estimatedHoursToBenchmark} hours
+                </p>
               </div>
             </div>
 
@@ -208,14 +241,31 @@ function ProgressPage() {
 
             <div className="mt-4 grid gap-3 md:grid-cols-3">
               {analysis.learningPathway.map((step) => (
-                <div key={step.step} className="rounded-md border border-border bg-surface-muted/30 p-3">
+                <div
+                  key={step.step}
+                  className="rounded-md border border-border bg-surface-muted/30 p-3"
+                >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-primary">Milestone {step.step}</span>
-                    <Badge tone={step.status === "completed" ? "success" : step.status === "in_progress" ? "secondary" : "neutral"}>
-                      {step.status === "completed" ? "Completed" : step.status === "in_progress" ? "In Progress" : "Pending"}
+                    <Badge
+                      tone={
+                        step.status === "completed"
+                          ? "success"
+                          : step.status === "in_progress"
+                            ? "secondary"
+                            : "neutral"
+                      }
+                    >
+                      {step.status === "completed"
+                        ? "Completed"
+                        : step.status === "in_progress"
+                          ? "In Progress"
+                          : "Pending"}
                     </Badge>
                   </div>
-                  <p className="mt-1.5 text-sm font-semibold text-foreground line-clamp-1">{step.title}</p>
+                  <p className="mt-1.5 text-sm font-semibold text-foreground line-clamp-1">
+                    {step.title}
+                  </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Target: <strong>{step.targetCompetency}</strong> · {step.estimatedHours}h
                   </p>
@@ -233,51 +283,59 @@ function ProgressPage() {
           title="Competency Growth Trend (Past 6 Months)"
           subtitle="Aggregate evaluation scores across civil service benchmarks"
         >
-          <div className="h-72 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trends} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
-                  axisLine={{ stroke: "var(--border)" }}
-                />
-                <YAxis
-                  domain={[50, 100]}
-                  tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
-                  axisLine={{ stroke: "var(--border)" }}
-                  unit="%"
-                />
-                <Tooltip
-                  formatter={(value: number) => [`${value}%`, "Competency Index"]}
-                  contentStyle={{
-                    backgroundColor: "var(--card)",
-                    borderColor: "var(--border)",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="score"
-                  stroke="#123B66"
-                  strokeWidth={3}
-                  dot={{ fill: "#E87524", strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-2 flex items-center justify-center gap-6 text-xs text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-              <span>Overall Score (% Benchmark)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-accent" />
-              <span>Assessment checkpoints</span>
-            </div>
-          </div>
+          {trends.length === 0 ? (
+            <p className="py-16 text-center text-sm text-muted-foreground">
+              No historical trend data available yet. Complete diagnostic assessments to plot competency growth.
+            </p>
+          ) : (
+            <>
+              <div className="h-72 w-full pt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={trends} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                      axisLine={{ stroke: "var(--border)" }}
+                    />
+                    <YAxis
+                      domain={[50, 100]}
+                      tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                      axisLine={{ stroke: "var(--border)" }}
+                      unit="%"
+                    />
+                    <Tooltip
+                      formatter={(value: number) => [`${value}%`, "Competency Index"]}
+                      contentStyle={{
+                        backgroundColor: "var(--card)",
+                        borderColor: "var(--border)",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="score"
+                      stroke="#123B66"
+                      strokeWidth={3}
+                      dot={{ fill: "#E87524", strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-2 flex items-center justify-center gap-6 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+                  <span>Overall Score (% Benchmark)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-accent" />
+                  <span>Assessment checkpoints</span>
+                </div>
+              </div>
+            </>
+          )}
         </Card>
 
         {/* Monthly Learning Hours */}
@@ -285,39 +343,47 @@ function ProgressPage() {
           title="Monthly Learning Hours"
           subtitle="Hours committed to self-paced modules and scenario exercises"
         >
-          <div className="h-72 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={trends} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
-                  axisLine={{ stroke: "var(--border)" }}
-                />
-                <YAxis
-                  tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
-                  axisLine={{ stroke: "var(--border)" }}
-                  unit="h"
-                />
-                <Tooltip
-                  formatter={(value: number) => [`${value} hrs`, "Learning Time"]}
-                  contentStyle={{
-                    backgroundColor: "var(--card)",
-                    borderColor: "var(--border)",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
-                  }}
-                />
-                <Bar dataKey="hoursSpent" fill="#1F5A91" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-2 flex items-center justify-center text-xs text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-sm bg-secondary" />
-              <span>Total Hours per Month</span>
-            </div>
-          </div>
+          {trends.length === 0 ? (
+            <p className="py-16 text-center text-sm text-muted-foreground">
+              No learning hours logged yet. Start an enrolled module to record hours.
+            </p>
+          ) : (
+            <>
+              <div className="h-72 w-full pt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={trends} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                      axisLine={{ stroke: "var(--border)" }}
+                    />
+                    <YAxis
+                      tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                      axisLine={{ stroke: "var(--border)" }}
+                      unit="h"
+                    />
+                    <Tooltip
+                      formatter={(value: number) => [`${value} hrs`, "Learning Time"]}
+                      contentStyle={{
+                        backgroundColor: "var(--card)",
+                        borderColor: "var(--border)",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
+                      }}
+                    />
+                    <Bar dataKey="hoursSpent" fill="#1F5A91" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-2 flex items-center justify-center text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-sm bg-secondary" />
+                  <span>Total Hours per Month</span>
+                </div>
+              </div>
+            </>
+          )}
         </Card>
       </div>
 
@@ -327,32 +393,38 @@ function ProgressPage() {
           title="Active Competencies Summary"
           subtitle="Current operational readiness scores compared with required targets"
         >
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {competencies.map((c) => {
-              const delta = c.target - c.score;
-              const meets = c.score >= c.target;
-              return (
-                <div key={c.id} className="rounded-md border border-border p-4 bg-surface-muted/30">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-foreground">{c.name}</span>
-                    <Badge tone={meets ? "success" : delta > 15 ? "danger" : "warning"}>
-                      {meets ? "Target Met" : `Gap: ${delta} pts`}
-                    </Badge>
+          {competencies.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              No competencies evaluated yet. Take a diagnostic assessment to measure operational readiness.
+            </p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {competencies.map((c) => {
+                const delta = c.target - c.score;
+                const meets = c.score >= c.target;
+                return (
+                  <div key={c.id} className="rounded-md border border-border p-4 bg-surface-muted/30">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-foreground">{c.name}</span>
+                      <Badge tone={meets ? "success" : delta > 15 ? "danger" : "warning"}>
+                        {meets ? "Target Met" : `Gap: ${delta} pts`}
+                      </Badge>
+                    </div>
+                    <div className="mt-3 flex items-baseline justify-between">
+                      <span className="text-2xl font-bold tabular-nums text-primary">{c.score}%</span>
+                      <span className="text-xs text-muted-foreground">Target: {c.target}%</span>
+                    </div>
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border">
+                      <div
+                        className={`h-full rounded-full ${meets ? "bg-success" : "bg-secondary"}`}
+                        style={{ width: `${c.score}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="mt-3 flex items-baseline justify-between">
-                    <span className="text-2xl font-bold tabular-nums text-primary">{c.score}%</span>
-                    <span className="text-xs text-muted-foreground">Target: {c.target}%</span>
-                  </div>
-                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border">
-                    <div
-                      className={`h-full rounded-full ${meets ? "bg-success" : "bg-secondary"}`}
-                      style={{ width: `${c.score}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
       </div>
     </AppLayout>

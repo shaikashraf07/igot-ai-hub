@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { CourseCard } from "@/components/CourseCard";
 import { EmptyState, ErrorState, LoadingState } from "@/components/FeedbackStates";
-import { PageHeader } from "@/components/ui/primitives";
+import { Button, PageHeader } from "@/components/ui/primitives";
 import { aiInsightService, courseService } from "@/services";
 import type { Course, RecommendationAIExplanation } from "@/types/igot";
 import { toast } from "sonner";
@@ -79,6 +79,21 @@ function Recommendations() {
       <PageHeader
         title="Recommended for You"
         subtitle="AI-curated learning resources mapped directly to your priority competency gaps and role requirements."
+        breadcrumbs={[{ label: "Recommended Learning" }]}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Link to="/courses">
+              <Button size="sm" variant="outline">
+                Full Catalogue →
+              </Button>
+            </Link>
+            <Link to="/skill-gaps">
+              <Button size="sm" variant="outline">
+                View Skill Gaps
+              </Button>
+            </Link>
+          </div>
+        }
       />
 
       {/* Cadre & Intelligence Policy Summary */}
@@ -152,7 +167,10 @@ function Recommendations() {
       </div>
 
       {isLoading ? (
-        <LoadingState message="Curating personalized modules matching your competency gaps..." count={2} />
+        <LoadingState
+          message="Curating personalized modules matching your competency gaps..."
+          count={2}
+        />
       ) : error ? (
         <ErrorState message={error} onRetry={() => loadRecommendations(activeFilter)} />
       ) : recommendations.length === 0 ? (

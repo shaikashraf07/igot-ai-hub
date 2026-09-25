@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ArrowRight, Info, Lock, Mail, ShieldCheck } from "lucide-react";
 import { Badge, Button } from "@/components/ui/primitives";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -10,8 +11,7 @@ export const Route = createFileRoute("/login")({
       { title: "Learner Sign In | iGOT AI Hub" },
       {
         name: "description",
-        content:
-          "Civil service authentication portal for the iGOT AI Hub competency platform.",
+        content: "Civil service authentication portal for the iGOT AI Hub competency platform.",
       },
     ],
   }),
@@ -20,34 +20,42 @@ export const Route = createFileRoute("/login")({
 
 /** Demo credentials — validated at login but never displayed as plaintext in the UI */
 const DEMO_EMAIL = "ashraf@gov.in";
-const DEMO_PASSWORD = "ashraf@069";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState(DEMO_EMAIL);
+  const { signIn, activateDemoMode } = useAuth();
+
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMsg(null);
 
-    // Validate demo credentials
-    if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
-      setTimeout(() => {
-        setIsLoading(false);
-        toast.success("Welcome back, Ashraf!");
-        navigate({ to: "/" });
-      }, 400);
+    const trimmedEmail = email.trim().toLowerCase();
+    const { error } = await signIn(trimmedEmail, password);
+
+    if (error) {
+      setIsLoading(false);
+      let userFriendlyError = error;
+      if (error.toLowerCase().includes("email not confirmed")) {
+        userFriendlyError =
+          "Email address not confirmed yet. Please check your Gmail inbox and verify your email before signing in.";
+      }
+      setErrorMsg(userFriendlyError);
+      toast.error(userFriendlyError);
     } else {
-      setTimeout(() => {
-        setIsLoading(false);
-        toast.error("Invalid credentials. Please use the demo login credentials.");
-      }, 400);
+      setIsLoading(false);
+      toast.success("Welcome back!");
+      navigate({ to: "/" });
     }
   };
 
   const handleDemoQuickLogin = () => {
+    activateDemoMode();
     toast.success("Authenticated as Ashraf (Demo Civil Servant)");
     navigate({ to: "/" });
   };
@@ -82,7 +90,9 @@ function LoginPage() {
           <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-secondary/30 bg-secondary/5 p-3.5 text-xs text-secondary">
             <Info className="mt-0.5 h-4 w-4 shrink-0" />
             <div>
-              <span className="font-semibold">Prototype Demonstration Mode:</span> This interface simulates Parichay / NIC single-sign-on. Authentication is not yet backed by real Supabase/production credentials.
+              <span className="font-semibold">Prototype Demonstration Mode:</span> Authentication is
+              backed by Supabase. Use a Gmail address for prototype authentication testing or use
+              one-click demo access.
             </div>
           </div>
 
@@ -93,35 +103,41 @@ function LoginPage() {
               </div>
               <h1 className="mt-3 text-2xl font-bold text-foreground">Sign In</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Enter your official government credentials or Parichay ID
+                Enter your email address
               </p>
             </div>
 
             <form onSubmit={handleLogin} className="mt-6 space-y-4">
               <div>
-                <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Government Email / Parichay ID
+                <label htmlFor="login-email" className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Email Address
                 </label>
                 <div className="relative mt-1">
                   <Mail className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                   <input
+                    id="login-email"
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@gov.in or name@nic.in"
+                    placeholder="name@gmail.com"
+                    aria-describedby="login-email-hint"
                     className="focus-ring w-full rounded-md border border-input bg-card py-2 pl-9 pr-3 text-sm text-foreground"
                   />
                 </div>
+                <p id="login-email-hint" className="mt-1 text-[11px] text-muted-foreground">
+                  Use a Gmail address for prototype authentication.
+                </p>
               </div>
 
               <div>
-                <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Password / PIN
+                <label htmlFor="login-password" className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Password
                 </label>
                 <div className="relative mt-1">
                   <Lock className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                   <input
+                    id="login-password"
                     type="password"
                     required
                     value={password}
@@ -131,6 +147,12 @@ function LoginPage() {
                   />
                 </div>
               </div>
+
+              {errorMsg && (
+                <div role="alert" aria-live="polite" className="rounded-md border border-destructive/20 bg-destructive/5 p-3 text-sm font-medium text-destructive">
+                  {errorMsg}
+                </div>
+              )}
 
               <Button type="submit" disabled={isLoading} className="mt-2 w-full">
                 {isLoading ? "Signing in..." : "Sign In to iGOT AI Hub"}
@@ -149,6 +171,7 @@ function LoginPage() {
             {/* Quick Demo Access Button */}
             <Button
               variant="outline"
+              type="button"
               onClick={handleDemoQuickLogin}
               className="w-full justify-between text-left border-primary/30 hover:bg-primary/5"
             >
@@ -157,7 +180,7 @@ function LoginPage() {
             </Button>
 
             <div className="mt-6 text-center text-xs text-muted-foreground">
-              New official learner?{" "}
+              New learner?{" "}
               <Link to="/signup" className="font-semibold text-secondary hover:underline">
                 Create an account
               </Link>

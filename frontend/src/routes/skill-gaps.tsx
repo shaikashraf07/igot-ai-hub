@@ -9,6 +9,7 @@ import {
   calculateSkillGap,
   competencyService,
   getPriorityTone,
+  governmentDatasetService,
 } from "@/services";
 import type {
   CompetencyAIInsight,
@@ -97,12 +98,20 @@ function SkillGapPage() {
       <PageHeader
         title="Skill Gap Analysis"
         subtitle="Where your current competency levels fall short of your role requirements, and what to do next."
+        breadcrumbs={[{ label: "Skill Gap Analysis" }]}
         actions={
-          <Link to="/assessments">
-            <Button variant="secondary">
-              <ClipboardCheck className="mr-1.5 h-4 w-4" /> Take Diagnostic Assessment
-            </Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link to="/assessments/reassessment">
+              <Button variant="outline" size="sm">
+                Reassessment Impact →
+              </Button>
+            </Link>
+            <Link to="/assessments">
+              <Button variant="secondary" size="sm">
+                <ClipboardCheck className="mr-1.5 h-4 w-4" aria-hidden="true" /> Take Diagnostic Assessment
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -124,8 +133,8 @@ function SkillGapPage() {
                       analysis.readinessBand === "Role Ready"
                         ? "success"
                         : analysis.readinessBand === "Moderate Progression Required"
-                        ? "warning"
-                        : "danger"
+                          ? "warning"
+                          : "danger"
                     }
                   >
                     {analysis.readinessBand}
@@ -160,7 +169,10 @@ function SkillGapPage() {
           {analysis.learningPathway && analysis.learningPathway.length > 0 ? (
             <Card
               title="Sequenced Learning Pathway"
-              subtitle={pathwayAI?.overallStrategy ?? "Prioritized step-by-step roadmap to eliminate role benchmark deficits"}
+              subtitle={
+                pathwayAI?.overallStrategy ??
+                "Prioritized step-by-step roadmap to eliminate role benchmark deficits"
+              }
             >
               <div className="grid gap-3 md:grid-cols-3">
                 {analysis.learningPathway.map((step) => {
@@ -181,11 +193,10 @@ function SkillGapPage() {
                         </div>
                         <h3 className="mt-2 text-sm font-semibold text-foreground">{step.title}</h3>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          Target: <strong>{step.targetCompetency}</strong> · Est: {step.estimatedHours} hrs
+                          Target: <strong>{step.targetCompetency}</strong> · Est:{" "}
+                          {step.estimatedHours} hrs
                         </p>
-                        <p className="mt-2 text-xs text-foreground/90">
-                          {step.expectedOutcome}
-                        </p>
+                        <p className="mt-2 text-xs text-foreground/90">{step.expectedOutcome}</p>
                         {aiStep ? (
                           <div className="mt-2 border-t border-border/60 pt-2 text-[11px] text-muted-foreground">
                             <span className="font-semibold text-primary">Why: </span>

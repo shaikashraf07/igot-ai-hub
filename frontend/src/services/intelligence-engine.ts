@@ -67,9 +67,7 @@ const COMPETENCY_INTEL_MAP: Record<string, CompetencyIntelligenceMeta> = {
   "Digital Skills": {
     cadreRelevance:
       "National Digital Public Infrastructure (DPI) adoption, e-Office 7.0 proficiency, and Digital Personal Data Protection (DPDP) compliance.",
-    rootCauses: [
-      "Inadequate anonymization check prior to open departmental dataset publishing",
-    ],
+    rootCauses: ["Inadequate anonymization check prior to open departmental dataset publishing"],
     recommendedCourseId: "c5",
     defaultHours: 5,
   },
@@ -108,7 +106,11 @@ export function calculateCourseMatchScore(
   // Factor 3: Provider Authority & Rating (0 - 15 points)
   const providerUpper = course.provider.toUpperCase();
   let providerScore = 10;
-  if (providerUpper.includes("CBC") || providerUpper.includes("LBSNAA") || providerUpper.includes("ISTM")) {
+  if (
+    providerUpper.includes("CBC") ||
+    providerUpper.includes("LBSNAA") ||
+    providerUpper.includes("ISTM")
+  ) {
     providerScore = 15;
   } else if (providerUpper.includes("NEGD") || providerUpper.includes("DARPG")) {
     providerScore = 13;
@@ -180,7 +182,11 @@ export function generateIntelligentRecommendations(
     return scored.filter((c) => c.recommendation?.tag === "Priority Gap Closer");
   }
   if (filter === "core") {
-    return scored.filter((c) => c.recommendation?.tag === "Cadre Core Essential" || c.recommendation?.tag === "Priority Gap Closer");
+    return scored.filter(
+      (c) =>
+        c.recommendation?.tag === "Cadre Core Essential" ||
+        c.recommendation?.tag === "Priority Gap Closer",
+    );
   }
   if (filter === "quick") {
     return scored.filter((c) => {
@@ -216,7 +222,7 @@ export function generateCompetencyAnalysis(
 
   if (gaps.some((g) => g.target - g.score >= 15)) {
     readinessBand = "Intensive Development Needed";
-    const largestGap = [...gaps].sort((a, b) => (b.target - b.score) - (a.target - a.score))[0];
+    const largestGap = [...gaps].sort((a, b) => b.target - b.score - (a.target - a.score))[0];
     readinessSummary = `Critical gap identified in ${largestGap?.name} (${largestGap?.score}% vs ${largestGap?.target}% benchmark). Targeted capacity building required prior to quarterly cadre review.`;
   } else if (gaps.length > 0) {
     readinessBand = "Moderate Progression Required";
@@ -237,9 +243,13 @@ export function generateCompetencyAnalysis(
       target: g.target,
       priority: getGapSeverity(deficit),
       evidence: `Assessment score of ${g.score}% is ${deficit} points below designated benchmark of ${g.target}%.`,
-      action: intel ? `Complete course: ${courses.find((c) => c.id === intel.recommendedCourseId)?.title ?? "Targeted module"}` : "Undertake targeted modular study",
+      action: intel
+        ? `Complete course: ${courses.find((c) => c.id === intel.recommendedCourseId)?.title ?? "Targeted module"}`
+        : "Undertake targeted modular study",
       category: g.category,
-      rootCause: intel?.rootCauses[0] ?? "Knowledge retention gap identified in administrative scenario evaluation.",
+      rootCause:
+        intel?.rootCauses[0] ??
+        "Knowledge retention gap identified in administrative scenario evaluation.",
       estimatedHoursToClose: intel?.defaultHours ?? 4,
       recommendedCourseId: intel?.recommendedCourseId,
     };
@@ -253,11 +263,13 @@ export function generateCompetencyAnalysis(
 
   // Sequenced Learning Pathway
   const learningPathway: LearningPathwayStep[] = [];
-  const sortedGaps = [...gaps].sort((a, b) => (b.target - b.score) - (a.target - a.score));
+  const sortedGaps = [...gaps].sort((a, b) => b.target - b.score - (a.target - a.score));
 
   sortedGaps.slice(0, 3).forEach((gap, index) => {
     const intel = COMPETENCY_INTEL_MAP[gap.name];
-    const matchedCourse = courses.find((c) => c.id === intel?.recommendedCourseId) ?? courses.find((c) => c.competency === gap.name);
+    const matchedCourse =
+      courses.find((c) => c.id === intel?.recommendedCourseId) ??
+      courses.find((c) => c.competency === gap.name);
 
     if (matchedCourse) {
       learningPathway.push({
@@ -268,7 +280,12 @@ export function generateCompetencyAnalysis(
         estimatedHours: intel?.defaultHours ?? 4,
         urgency: getGapSeverity(gap.target - gap.score),
         expectedOutcome: `Close ${gap.target - gap.score}-point deficit and elevate ${gap.name} score to role target (${gap.target}%).`,
-        status: (matchedCourse.progress ?? 0) >= 100 ? "completed" : (matchedCourse.progress ?? 0) > 0 ? "in_progress" : "pending",
+        status:
+          (matchedCourse.progress ?? 0) >= 100
+            ? "completed"
+            : (matchedCourse.progress ?? 0) > 0
+              ? "in_progress"
+              : "pending",
       });
     }
   });
@@ -291,24 +308,30 @@ export function generateCompetencyAnalysis(
 /**
  * Diagnostic Cognitive Observations for Assessment Results
  */
-export function generateDiagnosticInsights(answers: Record<string, number>, questions: AssessmentQuestion[]) {
+export function generateDiagnosticInsights(
+  answers: Record<string, number>,
+  questions: AssessmentQuestion[],
+) {
   const insights: AssessmentResult["diagnosticInsights"] = [];
 
   const insightDictionary: Record<string, { failureInsight: string; intervention: string }> = {
     q1: {
       failureInsight:
         "Reliance on official district report despite contradictory ground field data indicates vulnerability in evidence reconciliation.",
-      intervention: "Apply structured evidence synthesis and discrepancy documentation before formal file noting.",
+      intervention:
+        "Apply structured evidence synthesis and discrepancy documentation before formal file noting.",
     },
     q2: {
       failureInsight:
         "Temptation to issue blanket administrative warnings or take over files personally reveals delegation friction in team hierarchy.",
-      intervention: "Adopt root-cause bottleneck diagnosis and assign explicit task ownership with interim milestone reviews.",
+      intervention:
+        "Adopt root-cause bottleneck diagnosis and assign explicit task ownership with interim milestone reviews.",
     },
     q3: {
       failureInsight:
         "Preference for transferring staff or closing grievance tickets prematurely rather than diagnosing procedural flaws.",
-      intervention: "Perform Ishikawa / 5-Why root cause analysis on recurring sub-office grievances under CPGRAMS.",
+      intervention:
+        "Perform Ishikawa / 5-Why root cause analysis on recurring sub-office grievances under CPGRAMS.",
     },
     q4: {
       failureInsight:
@@ -316,9 +339,9 @@ export function generateDiagnosticInsights(answers: Record<string, number>, ques
       intervention: "Strict adherence to CSMOP Chapter 7 official noting formats.",
     },
     q5: {
-      failureInsight:
-        "Overlooking data anonymization before departmental dataset disclosure.",
-      intervention: "Mandatory compliance with DPDP Act 2023 and open data anonymization protocols.",
+      failureInsight: "Overlooking data anonymization before departmental dataset disclosure.",
+      intervention:
+        "Mandatory compliance with DPDP Act 2023 and open data anonymization protocols.",
     },
   };
 

@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { CourseCard } from "@/components/CourseCard";
 import { EmptyState, ErrorState, LoadingState } from "@/components/FeedbackStates";
-import { Card, PageHeader } from "@/components/ui/primitives";
+import { Button, Card, PageHeader } from "@/components/ui/primitives";
 import { competencyService, courseService } from "@/services";
 import type { Competency, Course } from "@/types/igot";
 import { toast } from "sonner";
@@ -86,13 +86,32 @@ function Catalogue() {
       <PageHeader
         title="iGOT Course Catalogue"
         subtitle="Browse verified capacity building courses mapped to civil service competencies."
+        breadcrumbs={[{ label: "iGOT Courses" }]}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Link to="/recommendations">
+              <Button size="sm" variant="secondary">
+                ★ AI Recommended Learning
+              </Button>
+            </Link>
+            <Link to="/my-learning">
+              <Button size="sm" variant="outline">
+                My Enrolled Courses →
+              </Button>
+            </Link>
+          </div>
+        }
       />
 
       <Card className="mb-6">
         <div className="grid gap-3 md:grid-cols-[1fr_auto_auto]">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <label htmlFor="course-catalogue-search" className="sr-only">
+              Search by course title, provider, or competency
+            </label>
+            <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <input
+              id="course-catalogue-search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by course title, provider, or competency..."
@@ -100,28 +119,36 @@ function Catalogue() {
               className="focus-ring w-full rounded-md border border-input bg-card py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground"
             />
           </div>
-          <select
-            value={competency}
-            onChange={(e) => setCompetency(e.target.value)}
-            aria-label="Filter by competency"
-            className="focus-ring rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground"
-          >
-            <option>All</option>
-            {competencies.map((c) => (
-              <option key={c.id}>{c.name}</option>
-            ))}
-          </select>
-          <select
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-            aria-label="Filter by level"
-            className="focus-ring rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground"
-          >
-            <option>All</option>
-            <option>Beginner</option>
-            <option>Intermediate</option>
-            <option>Advanced</option>
-          </select>
+          <div>
+            <label htmlFor="competency-filter-select" className="sr-only">Filter by competency</label>
+            <select
+              id="competency-filter-select"
+              value={competency}
+              onChange={(e) => setCompetency(e.target.value)}
+              aria-label="Filter by competency"
+              className="focus-ring w-full rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground cursor-pointer"
+            >
+              <option>All</option>
+              {competencies.map((c) => (
+                <option key={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="level-filter-select" className="sr-only">Filter by course level</label>
+            <select
+              id="level-filter-select"
+              value={level}
+              onChange={(e) => setLevel(e.target.value)}
+              aria-label="Filter by level"
+              className="focus-ring w-full rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground cursor-pointer"
+            >
+              <option>All</option>
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Advanced</option>
+            </select>
+          </div>
         </div>
         <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
           <span>{filtered.length} courses match your criteria</span>

@@ -34,7 +34,15 @@ export const initialCompetencies: Competency[] = [
   { id: "digital", name: "Digital Skills", score: 91, target: 85, category: "Functional" },
 ];
 
-export const initialCourses: Course[] = [
+export const defaultBaselineCompetencies: Competency[] = [
+  { id: "decision", name: "Decision Making", score: 50, target: 80, category: "Behavioural" },
+  { id: "leadership", name: "Leadership", score: 50, target: 80, category: "Behavioural" },
+  { id: "problem", name: "Problem Solving", score: 50, target: 80, category: "Functional" },
+  { id: "communication", name: "Communication", score: 50, target: 85, category: "Behavioural" },
+  { id: "digital", name: "Digital Skills", score: 50, target: 85, category: "Functional" },
+];
+
+export const staticCourseCatalog: Course[] = [
   {
     id: "c1",
     title: "Evidence-Based Decision Making for Administrators",
@@ -104,8 +112,8 @@ export const initialCourses: Course[] = [
     competency: "Communication",
     rating: 4.7,
     enrolled: 21870,
-    progress: 100,
-    isEnrolled: true,
+    progress: 0,
+    isEnrolled: false,
     description:
       "Standards and conventions for notes, drafts and official correspondence in government offices.",
     outcomes: [
@@ -124,8 +132,8 @@ export const initialCourses: Course[] = [
     competency: "Digital Skills",
     rating: 4.5,
     enrolled: 15230,
-    progress: 40,
-    isEnrolled: true,
+    progress: 0,
+    isEnrolled: false,
     description:
       "Understand the building blocks of India's digital public infrastructure and how to apply them in departmental service design.",
     outcomes: [
@@ -162,8 +170,8 @@ export const initialCourses: Course[] = [
     competency: "Problem Solving",
     rating: 4.8,
     enrolled: 14350,
-    progress: 100,
-    isEnrolled: true,
+    progress: 0,
+    isEnrolled: false,
     description:
       "Master citizen charter principles, proactive disclosures, and service quality benchmarks for public offices.",
     outcomes: [
@@ -181,8 +189,8 @@ export const initialCourses: Course[] = [
     competency: "Functional",
     rating: 4.5,
     enrolled: 29800,
-    progress: 100,
-    isEnrolled: true,
+    progress: 0,
+    isEnrolled: false,
     description:
       "Comprehensive walk-through of General Financial Rules (GFR) compliance and end-to-end direct purchase and bidding on GeM.",
     outcomes: [
@@ -200,8 +208,8 @@ export const initialCourses: Course[] = [
     competency: "Communication",
     rating: 4.9,
     enrolled: 32400,
-    progress: 65,
-    isEnrolled: true,
+    progress: 0,
+    isEnrolled: false,
     description:
       "Case studies and dilemma resolutions on impartiality, integrity, and ethical leadership in public governance.",
     outcomes: [
@@ -269,6 +277,22 @@ export const initialCourses: Course[] = [
   },
 ];
 
+const demoCourseEnrollments: Record<string, number> = {
+  c4: 100,
+  c5: 40,
+  c7: 100,
+  c8: 100,
+  c9: 65,
+};
+
+export const initialCourses: Course[] = staticCourseCatalog.map((c) => {
+  const demoProg = demoCourseEnrollments[c.id];
+  if (demoProg !== undefined) {
+    return { ...c, isEnrolled: true, progress: demoProg };
+  }
+  return c;
+});
+
 export const assessmentQuestions: AssessmentQuestion[] = [
   {
     id: "q1",
@@ -286,7 +310,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
   {
     id: "q2",
     competency: "Leadership",
-    question: "Your team repeatedly misses file movement timelines. The most effective response is to:",
+    question:
+      "Your team repeatedly misses file movement timelines. The most effective response is to:",
     options: [
       "Issue a written warning to all staff",
       "Take over the pending files yourself",
@@ -351,9 +376,24 @@ export const progressTrendData: ProgressTrendPoint[] = [
 ];
 
 export const tasksData: LearningTask[] = [
-  { id: "t1", title: "Complete Module 3 — Decision frameworks", due: "Due today", status: "urgent" },
-  { id: "t2", title: "Leadership competency reassessment", due: "Due in 3 days", status: "upcoming" },
-  { id: "t3", title: "Submit reflection note — Root Cause Analysis", due: "Due in 6 days", status: "upcoming" },
+  {
+    id: "t1",
+    title: "Complete Module 3 — Decision frameworks",
+    due: "Due today",
+    status: "urgent",
+  },
+  {
+    id: "t2",
+    title: "Leadership competency reassessment",
+    due: "Due in 3 days",
+    status: "upcoming",
+  },
+  {
+    id: "t3",
+    title: "Submit reflection note — Root Cause Analysis",
+    due: "Due in 6 days",
+    status: "upcoming",
+  },
 ];
 
 function getStored<T>(key: string, fallback: T): T {

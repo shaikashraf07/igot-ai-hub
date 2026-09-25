@@ -76,12 +76,20 @@ function MyLearning() {
       <PageHeader
         title="My Learning"
         subtitle="Active enrolled modules, self-paced progress, and certified course records."
+        breadcrumbs={[{ label: "My Learning" }]}
         actions={
-          <Link to="/courses">
-            <Button variant="outline">
-              <BookOpen className="mr-1.5 h-4 w-4" /> Explore Catalogue
-            </Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link to="/courses">
+              <Button variant="outline" size="sm">
+                <BookOpen className="mr-1.5 h-4 w-4" aria-hidden="true" /> Explore Catalogue
+              </Button>
+            </Link>
+            <Link to="/assessments/reassessment">
+              <Button size="sm" variant="secondary">
+                Verify Reassessment Impact →
+              </Button>
+            </Link>
+          </div>
         }
       />
 

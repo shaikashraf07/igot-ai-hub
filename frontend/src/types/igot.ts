@@ -27,10 +27,7 @@ export interface SkillGap {
 export type CourseLevel = "Beginner" | "Intermediate" | "Advanced";
 
 export type RecommendationTag =
-  | "Priority Gap Closer"
-  | "Cadre Core Essential"
-  | "Elective Advancement"
-  | "Cross-Functional";
+  "Priority Gap Closer" | "Cadre Core Essential" | "Elective Advancement" | "Cross-Functional";
 
 export interface RecommendationRationale {
   gapAddressed: string;
@@ -102,11 +99,13 @@ export interface AssessmentResult {
   }[];
   recommendedAction: string;
   recommendedCourseId?: string | undefined;
-  diagnosticInsights?: {
-    cognitiveArea: string;
-    behavioralObservation: string;
-    suggestedIntervention: string;
-  }[] | undefined;
+  diagnosticInsights?:
+    | {
+        cognitiveArea: string;
+        behavioralObservation: string;
+        suggestedIntervention: string;
+      }[]
+    | undefined;
 }
 
 export interface ReassessmentItem {
@@ -220,4 +219,3 @@ export interface AssessmentAIFeedback {
   cadreBenchmarkImplications: string;
   recommendedNextAction: string;
 }
-

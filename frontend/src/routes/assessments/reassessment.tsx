@@ -49,7 +49,9 @@ function ReassessmentPage() {
     setIsApplying(true);
     try {
       await assessmentService.applyReassessmentScores();
-      toast.success("Competency Profile updated with post-course reassessment scores! Check your Dashboard.");
+      toast.success(
+        "Competency Profile updated with post-course reassessment scores! Check your Dashboard.",
+      );
     } catch {
       toast.error("Failed to update competency profile.");
     } finally {
@@ -91,6 +93,10 @@ function ReassessmentPage() {
       <PageHeader
         title="Competency Reassessment Impact"
         subtitle="Evaluation of skill progression following completion of recommended iGOT learning modules."
+        breadcrumbs={[
+          { label: "Assessments", to: "/assessments" },
+          { label: "Reassessment Impact" },
+        ]}
         actions={
           <div className="flex flex-wrap gap-2">
             <Button
@@ -99,17 +105,60 @@ function ReassessmentPage() {
               variant="outline"
               className="border-success/30 text-success hover:bg-success/10"
             >
-              <Award className="mr-1.5 h-4 w-4" />
+              <Award className="mr-1.5 h-4 w-4" aria-hidden="true" />
               {isApplying ? "Updating..." : "Apply Reassessment to Profile"}
             </Button>
             <Link to="/progress">
               <Button variant="secondary">
-                <TrendingUp className="mr-1.5 h-4 w-4" /> View Long-Term Analytics
+                <TrendingUp className="mr-1.5 h-4 w-4" aria-hidden="true" /> View Long-Term Analytics
               </Button>
             </Link>
           </div>
         }
       />
+
+      {/* The 5-stage Reassessment Progression Pathway */}
+      <section className="gov-card mb-6 p-4 sm:p-5" aria-label="Reassessment Progression Cycle">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-secondary">
+              Competency Uplift Verification Cycle
+            </span>
+            <h2 className="text-sm sm:text-base font-bold text-foreground">
+              From Diagnostic Baseline to Verified Capability
+            </h2>
+          </div>
+          <Badge tone="accent">Evidence-Based</Badge>
+        </div>
+
+        <ol className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-5 text-center list-none p-0">
+          <li className="rounded-md border border-border bg-surface-muted/30 p-3">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">Stage 1</span>
+            <p className="mt-1 text-xs font-bold text-foreground">Previous Competency</p>
+            <p className="text-[11px] text-muted-foreground">Diagnostic Baseline</p>
+          </li>
+          <li className="rounded-md border border-border bg-surface-muted/30 p-3">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">Stage 2</span>
+            <p className="mt-1 text-xs font-bold text-foreground">Learning Completed</p>
+            <p className="text-[11px] text-muted-foreground">iGOT Modules</p>
+          </li>
+          <li className="rounded-md border border-secondary/40 bg-secondary/10 p-3">
+            <span className="text-[10px] font-bold text-secondary uppercase">Stage 3</span>
+            <p className="mt-1 text-xs font-bold text-secondary">Reassessment</p>
+            <p className="text-[11px] text-secondary/80">Scenario Evaluation</p>
+          </li>
+          <li className="rounded-md border border-border bg-surface-muted/30 p-3">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">Stage 4</span>
+            <p className="mt-1 text-xs font-bold text-foreground">New Competency</p>
+            <p className="text-[11px] text-muted-foreground">Updated Scores</p>
+          </li>
+          <li className="rounded-md border border-success/40 bg-success/10 p-3 col-span-2 sm:col-span-1">
+            <span className="text-[10px] font-bold text-success uppercase">Stage 5</span>
+            <p className="mt-1 text-xs font-bold text-success">Improvement (+Δ)</p>
+            <p className="text-[11px] text-success/80">Benchmark Achieved</p>
+          </li>
+        </ol>
+      </section>
 
       {/* Overview Stat Highlights */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -119,7 +168,9 @@ function ReassessmentPage() {
             <span className="h-2 w-2 rounded-full bg-success" />
           </div>
           <p className="mt-2 text-3xl font-semibold text-primary">+{avgGain}%</p>
-          <p className="mt-1 text-xs text-muted-foreground">Positive upward capability trajectory</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Positive upward capability trajectory
+          </p>
         </div>
 
         <div className="gov-card p-5">
@@ -141,7 +192,9 @@ function ReassessmentPage() {
           <p className="mt-2 text-3xl font-semibold text-primary">
             {metTargetCount} / {data.length}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">At or above designated cadre benchmark</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            At or above designated cadre benchmark
+          </p>
         </div>
 
         <div className="gov-card p-5">
@@ -198,7 +251,9 @@ function ReassessmentPage() {
                     <div className="rounded-md bg-surface-muted p-3">
                       <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                         <span>Baseline (Pre-learning)</span>
-                        <span className="font-semibold tabular-nums text-foreground">{item.before}%</span>
+                        <span className="font-semibold tabular-nums text-foreground">
+                          {item.before}%
+                        </span>
                       </div>
                       <ProgressBar value={item.before} tone="secondary" />
                     </div>
@@ -234,8 +289,9 @@ function ReassessmentPage() {
                   Leadership & Decision Making Consolidation
                 </h4>
                 <p className="mt-0.5 max-w-2xl text-xs text-muted-foreground">
-                  Decision Making recorded the highest single leap (+18 points). Complete the practical
-                  case study assessment in the next 14 days to lock in these verified capabilities.
+                  Decision Making recorded the highest single leap (+18 points). Complete the
+                  practical case study assessment in the next 14 days to lock in these verified
+                  capabilities.
                 </p>
               </div>
             </div>

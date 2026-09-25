@@ -36,7 +36,9 @@ export function CourseCard({
                   {course.recommendation.matchScore}% Match
                 </Badge>
                 <Badge
-                  tone={course.recommendation.tag === "Priority Gap Closer" ? "danger" : "secondary"}
+                  tone={
+                    course.recommendation.tag === "Priority Gap Closer" ? "danger" : "secondary"
+                  }
                   className="text-xs"
                 >
                   {course.recommendation.tag}
@@ -102,7 +104,9 @@ export function CourseCard({
                     {course.recommendation.matchScore}% Match
                   </Badge>
                   <Badge
-                    tone={course.recommendation.tag === "Priority Gap Closer" ? "danger" : "secondary"}
+                    tone={
+                      course.recommendation.tag === "Priority Gap Closer" ? "danger" : "secondary"
+                    }
                   >
                     {course.recommendation.tag}
                   </Badge>
@@ -128,9 +132,7 @@ export function CourseCard({
                 <span className="text-muted-foreground">·</span>
                 <span className="text-muted-foreground">{aiExplanation.priorityReason}</span>
               </div>
-              <p className="leading-relaxed text-foreground/90">
-                {aiExplanation.whyThisCourse}
-              </p>
+              <p className="leading-relaxed text-foreground/90">{aiExplanation.whyThisCourse}</p>
               <div className="grid gap-1 border-t border-border/60 pt-1.5 text-muted-foreground sm:grid-cols-2">
                 <div>
                   <strong className="text-foreground">Gap Addressed: </strong>
@@ -150,13 +152,16 @@ export function CourseCard({
               </p>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground pt-2 border-t border-border/60">
                 <span>
-                  <strong className="text-foreground">Deficit:</strong> {course.recommendation.pointsDeficit} pts
+                  <strong className="text-foreground">Deficit:</strong>{" "}
+                  {course.recommendation.pointsDeficit} pts
                 </span>
                 <span>
-                  <strong className="text-foreground">Projected Impact:</strong> +{course.recommendation.projectedGain} pts
+                  <strong className="text-foreground">Projected Impact:</strong> +
+                  {course.recommendation.projectedGain} pts
                 </span>
                 <span className="line-clamp-1">
-                  <strong className="text-foreground">Relevance:</strong> {course.recommendation.careerImpact}
+                  <strong className="text-foreground">Relevance:</strong>{" "}
+                  {course.recommendation.careerImpact}
                 </span>
               </div>
             </div>
@@ -189,34 +194,52 @@ export function CourseCard({
   }
 
   // Default: Catalogue variant
+  const isRecommended = Boolean(course.recommendation);
+
   return (
-    <Card className={cn("flex flex-col justify-between", className)}>
+    <Card
+      className={cn(
+        "flex flex-col justify-between transition-all",
+        isRecommended && "border-accent/40 bg-accent/[0.02] shadow-xs",
+        className,
+      )}
+    >
       <div>
-        <div className="flex items-start justify-between gap-2">
-          <Badge tone="secondary">{course.competency}</Badge>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Badge tone="secondary">{course.competency}</Badge>
+            {isRecommended ? (
+              <Badge tone="accent" className="font-semibold">
+                ★ AI Recommended ({course.recommendation?.matchScore}% Match)
+              </Badge>
+            ) : null}
+            {course.isEnrolled ? (
+              <Badge tone="success">Enrolled</Badge>
+            ) : null}
+          </div>
           <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Star className="h-3.5 w-3.5 text-accent" aria-hidden />
-            {course.rating}
+            <Star className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+            <span className="font-medium text-foreground">{course.rating}</span>
           </span>
         </div>
-        <h2 className="mt-3 text-base font-semibold text-foreground">{course.title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h2 className="mt-3 text-base font-bold text-foreground leading-snug">{course.title}</h2>
+        <p className="mt-1 text-xs text-muted-foreground">
           {course.provider} · {course.duration} · {course.level}
         </p>
-        <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{course.description}</p>
+        <p className="mt-2.5 line-clamp-3 text-xs sm:text-sm text-muted-foreground leading-relaxed">{course.description}</p>
 
         {progress > 0 ? (
           <div className="mt-4">
             <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-              <span>Progress</span>
-              <span>{progress}%</span>
+              <span className="font-medium text-foreground">Course Progress</span>
+              <span className="font-semibold tabular-nums text-foreground">{progress}%</span>
             </div>
             <ProgressBar value={progress} tone={progress === 100 ? "success" : "secondary"} />
           </div>
         ) : null}
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-2 pt-2">
+      <div className="mt-4 flex items-center justify-between gap-2 border-t border-border/60 pt-3">
         <span className="text-xs text-muted-foreground">
           {course.enrolled.toLocaleString("en-IN")} enrolled
         </span>
@@ -227,8 +250,8 @@ export function CourseCard({
             </Button>
           ) : null}
           <Link to="/courses/$courseId" params={{ courseId: course.id }}>
-            <Button size="sm" variant="outline">
-              View details
+            <Button size="sm" variant={course.isEnrolled ? "primary" : "outline"}>
+              {course.isEnrolled ? "Continue" : "View details"}
             </Button>
           </Link>
         </div>
